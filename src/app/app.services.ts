@@ -1,34 +1,48 @@
-import {Http , Headers } from '@angular/http';
-import {HttpResponse, HttpRequest } from 'selenium-webdriver/http';
-import { Component, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { Ip } from './app.component';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppServices {
-  constructor(private http: Http) { }
+  constructor(private http: HttpClient) { }
 
-  getbuscarip(ipIngresado: string): Promise<Ip[]> {
-    const url = 'https://ipapi.co/' + ipIngresado + '/json/';
+  getbuscarip(ipIngresado: string): Promise<Ip> {
+    return new Promise((resolve, reject) => {
+      const url: string = 'https://ipapi.co/' + ipIngresado + '/json/';
+      this.http.get<InterfaceIp>(url).subscribe((res) => {
+        if (res !== null) {
+          console.log(res);
+          resolve(this.parsear(res));
+        } else {
+          reject();
+        }
+      });
+    });
+  }
+  parsear(res: InterfaceIp) {
 
-    return this.http.get(url)
-        .toPromise()
-        .then(response => response.json().data as Ip[])
-        .catch(this.handleError);
-}
-private handleError(error: any): Promise<any> {
-  console.error('An error occurred', error);
-  return Promise.reject(error.message || error);
-}
-}
+    const ipClase: Ip = new Ip;
+    ipClase.ip = res.ip;
+    ipClase.pais = res.country_name;
+    ipClase.ciudad = res.city;
+    ipClase.latitud = res.latitude;
+    ipClase.longitud = res.longitude;
+    ipClase.paisCode = res.country;
+    ipClase.regionCode = res.region_code;
+    ipClase.region = res.region;
 
-export interface Ip {
-   ip: String;
-   ciudad: String;
-   region: String;
-   pais: String;
-   paisCode: String;
-   regionCode: String;
-   latitud: String;
-  longitud: String;
+    return ipClase;
+  }
+}
+export interface InterfaceIp {
+  ip: string;
+  city: string;
+  region: string;
+  country_name: string;
+  country: string;
+  region_code: string;
+  latitude: string;
+  longitude: string;
 }

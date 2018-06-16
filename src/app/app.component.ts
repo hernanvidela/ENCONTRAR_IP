@@ -1,28 +1,33 @@
-import { Component, OnInit } from '@angular/core';
-import {Http , Response } from '@angular/http';
-import {HttpResponse, HttpRequest } from 'selenium-webdriver/http';
-import { AppServices, Ip } from './app.services';
-import { ActivatedRoute } from '@angular/router';
+import { Component } from '@angular/core';
+import { AppServices } from './app.services';
+
 @Component({
+  selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent  {
   title = '';
   ipIngresado = '';
-  ipClase: Ip[];
-  constructor(private appServices: AppServices, private route: ActivatedRoute) { }
+  IpClase = new Ip();
 
-  ngOnInit() {
-    this.route.params.subscribe(params => {
-      this.ipIngresado = params['ipIngresado'];
+  constructor(private obj: AppServices) {}
 
-      if (this.ipIngresado) {
-        this.appServices.getbuscarip(this.ipIngresado).then(d => this.ipClase = d);
-      }
-    });
+  getDatosCiudad() {
+    this.obj.getbuscarip(this.ipIngresado)
+      .then((data) => (this.IpClase = data));
+      console.log(this.IpClase);
   }
-}
+  }
 
+export class Ip {
+  ip: string;
+  ciudad: string;
+  region: string;
+  pais: string;
+  paisCode: string;
+  regionCode: string;
+  latitud: string;
+ longitud: string;
+}
 
 
